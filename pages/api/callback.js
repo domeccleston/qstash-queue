@@ -1,18 +1,15 @@
-import { Redis } from "@upstash/redis";
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+// /api/callback.js
 
 export default async function handler(req, res) {
-  const { body } = req;
   try {
-    const decoded = atob(body.body);
-    const data = await redis.set(body.sourceMessageId, decoded);
-    console.log(data);
-    return res.status(200).send(decoded);
+    // responses from qstash are base64-encoded
+    const decoded = atob(req.body.body);
+    // I'm just logging this response, but here
+    // is where we could save it to a database etc
+    console.log(decoded);
   } catch (error) {
-    console.error(error);
+    console.error("error processing forwarded response");
   }
+
+  return res.status(200).end();
 }
